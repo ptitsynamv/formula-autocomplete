@@ -1,0 +1,11 @@
+{
+  "eslint.options": {
+    "extensions": [".ts", ".html", ".js"]
+  },
+  "eslint.validate": ["javascript", "typescript", "html"],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}

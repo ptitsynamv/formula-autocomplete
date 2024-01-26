@@ -1,0 +1,9 @@
+.editor-wrapper {
+  width: 500px;
+  margin: 20px auto;
+}
+
+.cm-editor {
+  font-family: Arial, monospace;
+  font-size: 20px;
+}
