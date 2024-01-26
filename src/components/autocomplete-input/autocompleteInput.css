@@ -1,6 +1,8 @@
-.editor-wrapper {
+.editor {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   width: 500px;
-  margin: 20px auto;
+  padding: 20px;
+  margin: auto;
 }
 
 .cm-editor {

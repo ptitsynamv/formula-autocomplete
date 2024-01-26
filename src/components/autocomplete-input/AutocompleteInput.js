@@ -58,16 +58,19 @@ const AutocompleteInput = () => {
 
   return (
     <>
-      {errorMessage}
-      {spinner}
-      {content}
+      <div className="editor">
+        {errorMessage}
+        {spinner}
+        {content}
+      </div>
     </>
   );
 };
 
 const View = ({ data, addTag, removeTag }) => {
   return (
-    <div className="editor-wrapper">
+    <>
+      <p>Autocomplete:</p>
       <CodeMirror
         extensions={[
           autocompletion({ override: [(e) => myCompletions(e, data)] }),
@@ -81,7 +84,7 @@ const View = ({ data, addTag, removeTag }) => {
           addTag(value);
         }}
       />
-    </div>
+    </>
   );
 };
 
