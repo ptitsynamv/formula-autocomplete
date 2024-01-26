@@ -38,11 +38,11 @@ const AutocompleteInput = () => {
 
   const useInputStore = create(
     devtools((set) => ({
-      tag: [],
-      addTag: (newTag) => set((state) => ({ tag: [...state.tag, newTag] })),
+      tags: [],
+      addTag: (newTag) => set((state) => ({ tags: [newTag] })),
       removeTag: (tagToRemove) =>
         set((state) => ({
-          tag: [...state.tag.filter((item) => item.id !== tagToRemove.id)],
+          tags: [...state.tags.filter((item) => item.id !== tagToRemove.id)],
         })),
     }))
   );
@@ -69,7 +69,6 @@ const View = ({ data, addTag, removeTag }) => {
   return (
     <div className="editor-wrapper">
       <CodeMirror
-        value=""
         extensions={[
           autocompletion({ override: [(e) => myCompletions(e, data)] }),
         ]}
