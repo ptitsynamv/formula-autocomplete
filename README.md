@@ -1,71 +1,108 @@
-# Getting Started with Create React App
-Used React, React Query, Zustand, CodeMirror.
+# Formula Autocomplete
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![Build](https://github.com/ptitsynamv/formula-autocomplete/actions/workflows/ci.yml/badge.svg)](https://github.com/ptitsynamv/formula-autocomplete/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+![React](https://img.shields.io/badge/React-18.2-61DAFB?logo=react&logoColor=white)
+![React Query](https://img.shields.io/badge/TanStack%20Query-v5-FF4154?logo=reactquery&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-4.5-443E38)
+![CodeMirror](https://img.shields.io/badge/CodeMirror-6-D30707?logo=codemirror&logoColor=white)
+![Create React App](https://img.shields.io/badge/Create%20React%20App-5.0.1-09D3AC?logo=createreactapp&logoColor=white)
+![Node](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)
 
-## Available Scripts
+A formula input with context-aware autocomplete, similar to the formula bar in a spreadsheet. As you type a formula such as `revenue - cost * 2`, the editor suggests variable names loaded from a remote API, both at the start of the formula and after each operator.
 
-In the project directory, you can run:
+Built with **React 18**, **TanStack React Query**, **Zustand** and **CodeMirror 6**.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Code-editor input.** The formula field is a CodeMirror 6 editor (via `@uiw/react-codemirror`), so you get cursor handling, undo/redo and keyboard navigation of suggestions.
+- **Suggestions that follow the formula.** Suggestions open for the first word, or for a word that comes after an operator: `+ - * / ^ ( )`.
+- **Suggestions from an API.** The list of names is fetched once with React Query, which handles caching and the loading and error states.
+- **Zustand store.** The current formula is saved in a Zustand store that you can inspect with the Redux DevTools extension.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+| Tool | Version |
+| ---- | ------- |
+| [Node.js](https://nodejs.org/) | 18 LTS or newer (tested on 24.22.1) |
+| npm | Comes with Node (the lockfile is v3, which needs npm 7+) |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This project uses **Create React App** (`react-scripts` 5.0.1), which is no longer maintained. It works on current Node versions. If you hit an environment problem, switch to a known-good LTS with [nvm](https://github.com/nvm-sh/nvm) (macOS/Linux) or [nvm-windows](https://github.com/coreybutler/nvm-windows):
 
-### `npm run build`
+```bash
+nvm install 20
+nvm use 20
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+# 1. Clone
+git clone https://github.com/ptitsynamv/formula-autocomplete.git
+cd formula-autocomplete
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# 2. Install exact locked dependencies
+npm ci
 
-### `npm run eject`
+# 3. Start the dev server
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+The app opens at <http://localhost:3000> and reloads when you edit a file.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+You need internet access: suggestions are fetched from a mock API at `https://652f91320b8d8ddac0b2b62b.mockapi.io/autocomplete`. Each item needs at least `id` and `name`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Available scripts
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+| Command | What it does |
+| ------- | ------------ |
+| `npm start` | Runs the dev server on port 3000 with hot reload. ESLint warnings appear in the terminal and the browser. |
+| `npm run build` | Makes an optimized production build in `build/`. |
+| `npm test` | Runs Jest in interactive watch mode. Use `CI=true npm test` to run it once. |
+| `npm run eject` | Copies the CRA config into the project. **One-way**; you can't undo it. |
 
-## Learn More
+To preview the production build:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npx serve -s build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Project structure
 
-### Code Splitting
+```text
+formula-autocomplete/
+├── public/                         # Static assets and the index.html shell
+├── src/
+│   ├── components/
+│   │   └── autocomplete-input/
+│   │       ├── AutocompleteInput.js   # CodeMirror editor, completion source, Zustand store
+│   │       └── autocompleteInput.css
+│   ├── hooks/
+│   │   └── http.hook.js            # useHttp: React Query useQuery that fetches suggestions
+│   ├── service/
+│   │   └── DataService.js          # useDataService: data-access layer over useHttp
+│   ├── App.js                      # Root component, provides the QueryClient
+│   └── index.js                    # Entry point, mounts <App /> in React.StrictMode
+├── package.json
+└── LICENSE
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### How it works
 
-### Analyzing the Bundle Size
+```text
+App ─► QueryClientProvider ─► AutocompleteInput ─► useDataService ─► useHttp ─► fetch(mock API)
+                                     │
+                                     ├─ CodeMirror + autocompletion({ override: [myCompletions] })
+                                     └─ Zustand store (tags) ◄── editor onChange
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+`myCompletions` looks at the text before the cursor. It returns the fetched items as completion options, using each item's `name` as the label and the inserted text, but only when the cursor is on the first word or right after an operator.
 
-### Making a Progressive Web App
+## Known limitations
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- `src/App.test.js` is still the default test that came with Create React App. It looks for a "learn react" link, so it fails until it's rewritten for this UI.
+- The mock API URL is hardcoded in `src/hooks/http.hook.js` and isn't set through an environment variable.
 
-### Advanced Configuration
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Released under the [MIT License](LICENSE). © 2024 Maria.
